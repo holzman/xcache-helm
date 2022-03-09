@@ -1,0 +1,8 @@
+Welcome to xcache!
+
+If you haven't already, create an X.509 certificate/key for the service,
+register it in the experiment's VO services, and create a secret named "certs" with 
+hostcert.pem and hostkey.pem referring to the certificate and key.
+
+Clients may need set the environment variable
+  XrdSecGSISRVNAMES={fqdn of the service} if accessing internally.

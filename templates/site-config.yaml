@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  10-common-site-local.cfg: |
+    set rootdir = /mnt/stash
+    set resourcename = {{ .Values.servername }}

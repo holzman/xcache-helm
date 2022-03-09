@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "xcache.fullname" . }}
+  labels:
+    {{- include "xcache.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "xcache.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "xcache.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: "DISABLE_OSG_MONITORING"
+              value: "true"
+          ports:
+            - name: xrootd
+              containerPort: 1094
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /etc/xrootd/config.d/10-common-site-local.cfg
+              name: site-config
+              subPath: 10-common-site-local.cfg
+            - mountPath: /etc/grid-security/hostcert.pem
+              name: xrd-certificate
+              subPath: hostcert.pem
+            - mountPath: /etc/grid-security/hostkey.pem
+              name: xrd-certificate
+              subPath: hostkey.pem
+            - mountPath: /xcache
+              name: xcache-data
+      volumes:
+        - name: site-config
+          configMap:
+            name: site-config
+        - name: xrd-certificate
+          secret:
+            secretName: certs
+        - name: xcache-data
+          persistentVolumeClaim:
+            claimName: xcache-data
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

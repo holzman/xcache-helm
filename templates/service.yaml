@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "xcache.fullname" . }}
+  labels:
+    {{- include "xcache.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 1094
+      protocol: TCP
+      name: xrootd
+  selector:
+    {{- include "xcache.selectorLabels" . | nindent 4 }}
