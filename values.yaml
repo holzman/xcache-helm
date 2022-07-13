@@ -9,7 +9,8 @@ image:
 #  repository: opensciencegrid/cms-xcache
 #  tag: release
   repository: harbor.apps.okddev.fnal.gov/burt/cms-xcache
-  tag: okd
+#  tag: okd
+  tag: bh
   pullPolicy: Always
 
 service:
